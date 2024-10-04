@@ -2,7 +2,7 @@ import { Form, useNavigation } from "@remix-run/react";
 
 import styles from "./NewNote.css";
 
-function NewNote() {
+function NewNote({ error }) {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 
@@ -11,6 +11,7 @@ function NewNote() {
       <p>
         <label htmlFor="title">Title</label>
         <input type="text" id="title" name="title" required />
+        {error && <p>{error}</p>}
       </p>
       <p>
         <label htmlFor="content">Content</label>

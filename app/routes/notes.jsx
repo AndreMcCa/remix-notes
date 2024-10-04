@@ -1,5 +1,5 @@
-import { Link, useActionData, useLoaderData } from "@remix-run/react";
-import { /* json, */ redirect } from "@remix-run/node";
+import { Link, useActionData, useCatch, useLoaderData } from "@remix-run/react";
+import { json, redirect } from "@remix-run/node";
 
 import NewNote, { links as newNoteLinks } from "../components/NewNote/NewNote";
 import NoteList, { links as noteListLinks } from "../components/NoteList/NoteList";
@@ -8,12 +8,24 @@ import { getStoredNotes, storeNotes } from "../data/notes";
 
 export default function NotesPage() {
   const { notes } = useLoaderData();
-  const { message } = useActionData();
+  const data = useActionData();
 
   return (
     <main>
-      <NewNote error={message} />
+      <NewNote error={data?.message} />
       <NoteList notes={notes} />
+    </main>
+  );
+}
+
+export function CatchBoundary() {
+  const caughtResponse = useCatch(); // deprecated
+  const message = caughtResponse.data?.message || "Data not found!";
+
+  return (
+    <main>
+      <NewNote />
+      <p className="info-message">{message}</p>
     </main>
   );
 }
@@ -33,6 +45,11 @@ export function ErrorBoundary({ error }) {
 
 export async function loader() {
   const notes = await getStoredNotes();
+
+  if (!notes || notes.length === 0) {
+    throw json({ message: "Could not find any notes." }, { status: 404, statusText: "No found" });
+  }
+
   return { notes };
 
   // return new Response(JSON.stringify(notes), {
@@ -49,7 +66,6 @@ export async function action(data) {
   const formData = await request.formData();
 
   const noteData = Object.fromEntries(formData);
-  // Add validation ...
 
   if (noteData.title.trim().length < 5) {
     return { message: "Title must be at least 5 characters" };
