@@ -94,3 +94,10 @@ export function ErrorBoundary({ error }) {
 export function links() {
   return [{ rel: "stylesheet", href: styles }];
 }
+
+export function meta() {
+  return {
+    title: "Remix Starter",
+    description: "A starter for Remix!",
+  };
+}

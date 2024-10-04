@@ -84,3 +84,10 @@ export async function action(data) {
 export function links() {
   return [...newNoteLinks(), ...noteListLinks()];
 }
+
+export function meta() {
+  return {
+    title: "Notes",
+    description: "A simple note-taking app.",
+  };
+}
