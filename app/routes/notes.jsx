@@ -1,4 +1,4 @@
-import { useLoaderData } from "@remix-run/react";
+import { useActionData, useLoaderData } from "@remix-run/react";
 import { /* json, */ redirect } from "@remix-run/node";
 
 import NewNote, { links as newNoteLinks } from "../components/NewNote/NewNote";
@@ -8,10 +8,11 @@ import { getStoredNotes, storeNotes } from "../data/notes";
 
 export default function NotesPage() {
   const { notes } = useLoaderData();
+  const { message } = useActionData();
 
   return (
     <main>
-      <NewNote />
+      <NewNote error={message} />
       <NoteList notes={notes} />
     </main>
   );
@@ -35,12 +36,19 @@ export async function action(data) {
   const formData = await request.formData();
 
   const noteData = Object.fromEntries(formData);
-  noteData.id = new Date().toISOString();
   // Add validation ...
 
+  if (noteData.title.trim().length < 5) {
+    return { message: "Title must be at least 5 characters" };
+  }
+
   const existingNotes = await getStoredNotes();
+  noteData.id = new Date().toISOString();
   const updatedNotes = existingNotes.concat(noteData);
   await storeNotes(updatedNotes);
+
+  // await new Promise((resolve) => setTimeout(resolve, 2000));
+
   return redirect("/notes");
 }
 
