@@ -1,4 +1,4 @@
-import { useActionData, useLoaderData } from "@remix-run/react";
+import { Link, useActionData, useLoaderData } from "@remix-run/react";
 import { /* json, */ redirect } from "@remix-run/node";
 
 import NewNote, { links as newNoteLinks } from "../components/NewNote/NewNote";
@@ -14,6 +14,19 @@ export default function NotesPage() {
     <main>
       <NewNote error={message} />
       <NoteList notes={notes} />
+    </main>
+  );
+}
+
+export function ErrorBoundary({ error }) {
+  return (
+    <main className="error">
+      <h1>An error related to your notes ocurred!</h1>
+      <p>{error.message}</p>
+
+      <p>
+        Back to <Link to="/">safety</Link>!
+      </p>
     </main>
   );
 }
